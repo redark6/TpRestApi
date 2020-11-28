@@ -1,0 +1,91 @@
+package fr.paris8univ.iut.csid.csidwebrepositorybase;
+
+import java.net.URISyntaxException;
+import java.time.Instant;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+import org.springframework.web.client.RestClientException;
+
+@Repository
+public class GitRepositoryRepository {
+	
+	private final GitRepositoryDao gitRepositoryDao;
+	private final GitHubRepositoryDao gitHubRepositoryDao;
+	
+	@Autowired
+	public GitRepositoryRepository(GitRepositoryDao gitRepositoryDao,GitHubRepositoryDao gitHubRepositoryDao) {
+		this.gitRepositoryDao=gitRepositoryDao;
+		this.gitHubRepositoryDao=gitHubRepositoryDao;
+	}
+	
+	public List<GitRepository> getRepositories(){
+		List<GitRepositoryEntity> repositoryEntities = gitRepositoryDao.findAll();
+		return repositoryEntities.stream()
+				.map(x -> new GitRepository(x.getName(),x.getOwner(),x.getIssues(),x.getFork(),x.getlastUpdate()))
+				.collect(Collectors.toList());
+	}
+	
+	public Optional<GitRepository> findOneRepository(String name) throws RestClientException, URISyntaxException{
+		GitRepositoryEntity actualRepository = gitRepositoryDao.findById(name).get();
+		GitRepository toReturn= new GitRepository(actualRepository.getName(),actualRepository.getOwner(),actualRepository.getIssues(),actualRepository.getFork(),actualRepository.getlastUpdate());
+		
+		if((Instant.now().getEpochSecond()-toReturn.getLastUpdate())>300) {
+			GitRepositoryDTO gitInfo = gitHubRepositoryDao.getGitInfo(toReturn.getName(), toReturn.getOwner());
+			toReturn.setIssues(gitInfo.getIssues());
+			toReturn.setFork(gitInfo.getForks());
+			toReturn.setLastUpdate(Instant.now().getEpochSecond());
+			patchRepository(name,toReturn);
+		}
+		
+		return Optional.of(toReturn);
+	}
+	
+	public void creatRepository(GitRepository gitRepository){
+		gitRepositoryDao.save(new GitRepositoryEntity(gitRepository.getName(),gitRepository.getOwner(),gitRepository.getIssues(),gitRepository.getFork(),gitRepository.getLastUpdate()));
+	}
+	
+	public void putRepository(String name,GitRepository gitRepository) {
+		
+		Optional<GitRepositoryEntity> repository = gitRepositoryDao.findById(name);
+		
+		if(repository.isEmpty()) {
+			creatRepository(gitRepository);
+		}
+		else {
+			
+			GitRepositoryEntity repositoryModified = repository.get();
+			
+			repositoryModified.setOwner(gitRepository.getOwner());
+			repositoryModified.setIssues(gitRepository.getIssues());
+			repositoryModified.setFork(gitRepository.getFork());
+			
+			gitRepositoryDao.save(repositoryModified);
+		}
+		
+	}
+	
+	public void patchRepository(String name, GitRepository gitRepository) {
+		Optional<GitRepositoryEntity> repository = gitRepositoryDao.findById(name);
+		GitRepositoryEntity repositoryModified = repository.get();
+		
+		if(gitRepository.getOwner() != null)
+			repositoryModified.setOwner(gitRepository.getOwner());
+		
+		if(gitRepository.getIssues() != 0 )
+			repositoryModified.setIssues(gitRepository.getIssues());
+		
+		if(gitRepository.getFork() != 0)
+			repositoryModified.setFork(gitRepository.getFork());
+		
+		gitRepositoryDao.save(repositoryModified);
+	}
+	
+	public void deleteRepository(String name) {
+		gitRepositoryDao.deleteById(name);
+	}
+
+}
