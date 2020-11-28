@@ -29,6 +29,10 @@ public class GitRepositoryRepository {
 				.collect(Collectors.toList());
 	}
 	
+	public Optional<GitRepository> findOneRepoForPatch(String name){
+		return Optional.of(gitRepositoryDao.findById(name).map(x-> new GitRepository(x.getName(),x.getOwner(),x.getIssues(),x.getFork(),x.getlastUpdate())).get());
+	}
+	
 	public Optional<GitRepository> findOneRepository(String name) throws RestClientException, URISyntaxException{
 		GitRepositoryEntity actualRepository = gitRepositoryDao.findById(name).get();
 		GitRepository toReturn= new GitRepository(actualRepository.getName(),actualRepository.getOwner(),actualRepository.getIssues(),actualRepository.getFork(),actualRepository.getlastUpdate());
@@ -38,7 +42,7 @@ public class GitRepositoryRepository {
 			toReturn.setIssues(gitInfo.getIssues());
 			toReturn.setFork(gitInfo.getForks());
 			toReturn.setLastUpdate(Instant.now().getEpochSecond());
-			patchRepository(name,toReturn);
+			patchRepository(toReturn);
 		}
 		
 		return Optional.of(toReturn);
@@ -68,20 +72,9 @@ public class GitRepositoryRepository {
 		
 	}
 	
-	public void patchRepository(String name, GitRepository gitRepository) {
-		Optional<GitRepositoryEntity> repository = gitRepositoryDao.findById(name);
-		GitRepositoryEntity repositoryModified = repository.get();
-		
-		if(gitRepository.getOwner() != null)
-			repositoryModified.setOwner(gitRepository.getOwner());
-		
-		if(gitRepository.getIssues() != 0 )
-			repositoryModified.setIssues(gitRepository.getIssues());
-		
-		if(gitRepository.getFork() != 0)
-			repositoryModified.setFork(gitRepository.getFork());
-		
-		gitRepositoryDao.save(repositoryModified);
+	public void patchRepository(GitRepository gitRepo) {
+		GitRepositoryEntity repositoryPatched = new GitRepositoryEntity(gitRepo.getName(),gitRepo.getOwner(),gitRepo.getIssues(),gitRepo.getFork(),gitRepo.getLastUpdate());
+		gitRepositoryDao.save(repositoryPatched);
 	}
 	
 	public void deleteRepository(String name) {

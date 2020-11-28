@@ -35,11 +35,24 @@ public class RepositoryService {
 	}
 	
 	public void patchRepository(String name, GitRepository gitRepository) {
-		gitRepositoryRepository.patchRepository(name, gitRepository);
+		GitRepository gitRepoPatched = merge(this.gitRepositoryRepository.findOneRepoForPatch(name),gitRepository);
+		gitRepositoryRepository.patchRepository(gitRepoPatched);
 	}
 	
 	public void deleteRepository(String name) {
 		gitRepositoryRepository.deleteRepository(name);
+	}
+	
+	private GitRepository merge(Optional<GitRepository> oldRepOptional,GitRepository newRep) {	
+		GitRepository oldRep=oldRepOptional.get();
+		if(newRep.getOwner() != null)
+			oldRep.setOwner(newRep.getOwner());	
+		if(newRep.getIssues() != 0 )
+			oldRep.setIssues(newRep.getIssues());
+		if(newRep.getFork() != 0)
+			oldRep.setFork(newRep.getFork());
+		
+		return oldRep;
 	}
 
 }
