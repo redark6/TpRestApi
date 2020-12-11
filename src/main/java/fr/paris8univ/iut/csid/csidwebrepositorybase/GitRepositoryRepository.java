@@ -15,11 +15,13 @@ public class GitRepositoryRepository {
 	
 	private final GitRepositoryDao gitRepositoryDao;
 	private final GitHubRepositoryDao gitHubRepositoryDao;
+	private final StatDao statDao;
 	
 	@Autowired
-	public GitRepositoryRepository(GitRepositoryDao gitRepositoryDao,GitHubRepositoryDao gitHubRepositoryDao) {
+	public GitRepositoryRepository(GitRepositoryDao gitRepositoryDao,GitHubRepositoryDao gitHubRepositoryDao,StatDao statDao) {
 		this.gitRepositoryDao=gitRepositoryDao;
 		this.gitHubRepositoryDao=gitHubRepositoryDao;
+		this.statDao=statDao;
 	}
 	
 	public List<GitRepository> getRepositories(){
@@ -42,6 +44,10 @@ public class GitRepositoryRepository {
 			toReturn.setIssues(gitInfo.getIssues());
 			toReturn.setFork(gitInfo.getForks());
 			toReturn.setLastUpdate(Instant.now().getEpochSecond());
+			
+			statDao.save(new StatEntity(0,toReturn.getName(),"issues",toReturn.getLastUpdate(),toReturn.getIssues()));
+			statDao.save(new StatEntity(0,toReturn.getName(),"forks",toReturn.getLastUpdate(),toReturn.getFork()));
+			
 			patchRepository(toReturn);
 		}
 		

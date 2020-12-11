@@ -1,1 +1,2 @@
 CREATE TABLE repository (name varchar(50) PRIMARY KEY NOT NULL, owner varchar(50) NOT NULL, issues int, fork int, lastUpdate bigint default 0);
+CREATE TABLE statistique (id SERIAL PRIMARY KEY ,name varchar(50) NOT NULL,entry_type varchar(50) , creationdate bigint, value int);
