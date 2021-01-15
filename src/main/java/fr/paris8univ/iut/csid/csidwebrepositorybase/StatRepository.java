@@ -3,13 +3,14 @@ package fr.paris8univ.iut.csid.csidwebrepositorybase;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public class StatRepository {
 	
 	private final StatDao statDao;
-	
+	@Autowired
 	public StatRepository(StatDao statDao) {
 		this.statDao=statDao;
 	}

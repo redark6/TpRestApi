@@ -1,9 +1,14 @@
 package fr.paris8univ.iut.csid.csidwebrepositorybase;
 
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestClientException;
 
 @Service
@@ -53,6 +58,10 @@ public class RepositoryService {
 			oldRep.setFork(newRep.getFork());
 		
 		return oldRep;
+	}
+	
+	public Optional<IssueReturned> creatIssue(String name,String title, String body) throws RestClientException, URISyntaxException {
+		return gitRepositoryRepository.creatIssue(name,title,body);
 	}
 
 }

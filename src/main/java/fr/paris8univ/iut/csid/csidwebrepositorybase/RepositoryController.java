@@ -12,9 +12,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestClientException;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -66,6 +68,15 @@ public class RepositoryController {
 	public void deleteRepository(@PathVariable String name) {
 		repositoryService.deleteRepository(name);
 	}
+
+	
+	@PostMapping("createIssue/{name}/{title}")
+	public ResponseEntity<IssueReturned> creatIssue(@PathVariable String name,@PathVariable String title, @RequestParam String body) throws RestClientException, URISyntaxException, IOException{
+		return repositoryService.creatIssue(name,title,body)
+				.map(ResponseEntity::ok)
+				.orElse(ResponseEntity.notFound().build());
+	}
+
 
 
 }

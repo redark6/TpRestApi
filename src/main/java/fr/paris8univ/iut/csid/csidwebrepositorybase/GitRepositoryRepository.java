@@ -1,5 +1,9 @@
 package fr.paris8univ.iut.csid.csidwebrepositorybase;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.time.Instant;
 import java.util.List;
@@ -9,6 +13,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.client.RestClientException;
+
 
 @Repository
 public class GitRepositoryRepository {
@@ -86,5 +91,24 @@ public class GitRepositoryRepository {
 	public void deleteRepository(String name) {
 		gitRepositoryDao.deleteById(name);
 	}
-
+	
+	public Optional<IssueReturned> creatIssue(String name,String title, String body) throws RestClientException, URISyntaxException{
+		GitRepositoryEntity repo = gitRepositoryDao.findById(name).get();
+		Issue issue = new Issue(title,body);
+		return Optional.of(gitHubRepositoryDao.createIssue(repo.getName(), repo.getOwner(),getToken(),issue));
+	}
+	
+	public String getToken() {
+		try {
+			BufferedReader buffer = new BufferedReader(new FileReader(new File("./src/main/resources/key.txt")));
+			String key=buffer.readLine();
+			buffer.close();
+			System.out.println(key);
+			return key;
+		}
+		catch (Exception e) {
+		}
+		return "";
+	}
+	
 }
