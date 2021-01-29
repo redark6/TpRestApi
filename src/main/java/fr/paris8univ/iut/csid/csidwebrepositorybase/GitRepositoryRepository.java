@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.client.RestClientException;
 
@@ -21,12 +22,14 @@ public class GitRepositoryRepository {
 	private final GitRepositoryDao gitRepositoryDao;
 	private final GitHubRepositoryDao gitHubRepositoryDao;
 	private final StatDao statDao;
+	private final String token;
 	
 	@Autowired
-	public GitRepositoryRepository(GitRepositoryDao gitRepositoryDao,GitHubRepositoryDao gitHubRepositoryDao,StatDao statDao) {
+	public GitRepositoryRepository(GitRepositoryDao gitRepositoryDao,GitHubRepositoryDao gitHubRepositoryDao,StatDao statDao,@Value("${mon.token.github}") String token) {
 		this.gitRepositoryDao=gitRepositoryDao;
 		this.gitHubRepositoryDao=gitHubRepositoryDao;
 		this.statDao=statDao;
+		this.token=token;
 	}
 	
 	public List<GitRepository> getRepositories(){
@@ -95,7 +98,7 @@ public class GitRepositoryRepository {
 	public Optional<IssueReturned> creatIssue(String name,String title, String body) throws RestClientException, URISyntaxException{
 		GitRepositoryEntity repo = gitRepositoryDao.findById(name).get();
 		Issue issue = new Issue(title,body);
-		return Optional.of(gitHubRepositoryDao.createIssue(repo.getName(), repo.getOwner(),getToken(),issue));
+		return Optional.of(gitHubRepositoryDao.createIssue(repo.getName(), repo.getOwner(),token,issue));
 	}
 	
 	public String getToken() {
