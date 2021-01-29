@@ -70,9 +70,9 @@ public class RepositoryController {
 	}
 
 	
-	@PostMapping("createIssue/{name}/{title}")
-	public ResponseEntity<IssueReturned> creatIssue(@PathVariable String name,@PathVariable String title, @RequestParam String body) throws RestClientException, URISyntaxException, IOException{
-		return repositoryService.creatIssue(name,title,body)
+	@PostMapping("{name}/issue")
+	public ResponseEntity<IssueReturned> creatIssue(@PathVariable String name,@RequestBody Issue issue) throws RestClientException, URISyntaxException, IOException{
+		return repositoryService.creatIssue(name,issue)
 				.map(ResponseEntity::ok)
 				.orElse(ResponseEntity.notFound().build());
 	}

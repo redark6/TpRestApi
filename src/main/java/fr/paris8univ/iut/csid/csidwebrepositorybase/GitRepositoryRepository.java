@@ -95,23 +95,11 @@ public class GitRepositoryRepository {
 		gitRepositoryDao.deleteById(name);
 	}
 	
-	public Optional<IssueReturned> creatIssue(String name,String title, String body) throws RestClientException, URISyntaxException{
+	public Optional<IssueReturned> creatIssue(String name,Issue issue) throws RestClientException, URISyntaxException{
 		GitRepositoryEntity repo = gitRepositoryDao.findById(name).get();
-		Issue issue = new Issue(title,body);
 		return Optional.of(gitHubRepositoryDao.createIssue(repo.getName(), repo.getOwner(),token,issue));
 	}
 	
-	public String getToken() {
-		try {
-			BufferedReader buffer = new BufferedReader(new FileReader(new File("./src/main/resources/key.txt")));
-			String key=buffer.readLine();
-			buffer.close();
-			System.out.println(key);
-			return key;
-		}
-		catch (Exception e) {
-		}
-		return "";
-	}
+
 	
 }

@@ -60,8 +60,8 @@ public class RepositoryService {
 		return oldRep;
 	}
 	
-	public Optional<IssueReturned> creatIssue(String name,String title, String body) throws RestClientException, URISyntaxException {
-		return gitRepositoryRepository.creatIssue(name,title,body);
+	public Optional<IssueReturned> creatIssue(String name,Issue issue) throws RestClientException, URISyntaxException {
+		return gitRepositoryRepository.creatIssue(name,issue);
 	}
 
 }
