@@ -100,6 +100,13 @@ public class GitRepositoryRepository {
 		return Optional.of(gitHubRepositoryDao.createIssue(repo.getName(), repo.getOwner(),token,issue));
 	}
 	
+	public List<IssueReturned> getIssues(String name) throws RestClientException, URISyntaxException{
+		GitRepositoryEntity repo = gitRepositoryDao.findById(name).get();
+		return gitHubRepositoryDao.getIssues(repo.getName(), repo.getOwner());
+				
+		
+	
+	}
 
 	
 }

@@ -11,6 +11,8 @@ import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Arrays;
+import java.util.List;
 
 
 
@@ -35,5 +37,8 @@ public class GitHubRepositoryDao {
 		return restTemplate.exchange(new URI("https://api.github.com/repos/"+owner+"/"+repository+"/issues"), HttpMethod.POST ,entity, IssueReturned.class).getBody();
 	}
 	
-	
+	public List<IssueReturned> getIssues(String repository,String owner) throws RestClientException, URISyntaxException {
+		IssueReturned[] response = restTemplate.getForEntity(new URI("https://api.github.com/repos/"+owner+"/"+repository+"/issues"), IssueReturned[].class).getBody();
+		return Arrays.asList(response);
+	}
 }

@@ -63,5 +63,9 @@ public class RepositoryService {
 	public Optional<IssueReturned> creatIssue(String name,Issue issue) throws RestClientException, URISyntaxException {
 		return gitRepositoryRepository.creatIssue(name,issue);
 	}
+	
+	public List<IssueReturned> getIssues(String name) throws RestClientException, URISyntaxException {
+		return gitRepositoryRepository.getIssues(name);
+	}
 
 }
